@@ -37,7 +37,7 @@
 ```
 0.8 - The initial release
     - Actions
-        - Operators - Get a Boolean result comparing 2 values.
+        - Operators - Get a Boolean result comparing 2 values. ( Operators are == , != , >= , <= , > , < , * , / , + , - )
         - If Then Operator - Compare 2 Values/States and store a value upon sucess.
         - If Then Else Operator - Compare 2 Values/States and store a value upon success/fail.
         - SubString - Obtain a portion of the string defining the Start and End point.
