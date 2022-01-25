@@ -147,12 +147,14 @@ Returns a portion of the string provided with length set.
 ### Screen Capture
 
 Will return a 128x128 Image capture of the screen at designated coordinates.
+  - Note: Border Option will make the selected sides transparent by the amount of pixels selected, useful for displaying a border around the image.
 
 ![Screen Capture](resources/ScreenCapture.png)
 
 ### Window Capture
 
 Will return a 128x128 Image capture of the application at designated coordinates.
+  - Note: Border Option will make the selected sides transparent by the amount of pixels selected, useful for displaying a border around the image.
 
 ![Window Capture](resources/WindowCapture.png)
 
