@@ -170,7 +170,7 @@ Repeat Actions at set intervals.
 
 Obtain the value of a slider and store it.
 
-![Get Slider Value](resources/GetSliderValue.png)
+![Get Slider Value](resources/SliderValue.png)
 
 ## States
 
