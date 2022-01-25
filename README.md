@@ -151,9 +151,9 @@ Will return a 128x128 Image capture of the screen at designated coordinates.
 
 ![Screen Capture](resources/ScreenCapture.png)
 
-### Window Capture
+### Window Capture ( Beta )
 
-Will return a 128x128 Image capture of the application at designated coordinates.
+Will return a 128x128 Image capture of the application at designated coordinates. ( Still In Progress )
   - Note: Border Option will make the selected sides transparent by the amount of pixels selected, useful for displaying a border around the image.
 
 ![Window Capture](resources/WindowCapture.png)
