@@ -64,7 +64,9 @@
 ```
 
 ## Description
-These are basic programming functions plus some extra tools added to make customizing touch portal easier.
+These are basic programming functions plus some extra tools added to make customizing touch portal easier. 
+
+- Warning: It is advised when using any of the returned results ( States ) from any Actions from this plugin, in succession, to use a "Wait for Timer" Action to allow the plugin to process the result and return it. Touch Portal and this plugin run separately and failing to allow time for the value to be returned may produce undesired results.
 
 This is still being worked on and there may be bugs or unpredictable results.
 
