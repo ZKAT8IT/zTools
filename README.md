@@ -53,7 +53,7 @@
     - Events
         - Timer - Repeat Actions at set intervals.
     - Connectors
-        - Get Slider Value - Obtain the value of a slider andd store it.
+        - Get Slider Value - Obtain the value of a slider and store it.
     - States
         - opResults - States used to store Operation results.
         - strResults - States used to store String results.
@@ -155,6 +155,22 @@ Will return a 128x128 Image capture of the screen at designated coordinates.
 Will return a 128x128 Image capture of the application at designated coordinates.
 
 ![Window Capture](resources/WindowCapture.png)
+
+## Events
+
+### Timer
+
+Repeat Actions at set intervals.
+
+![Timer](resources/Timer.png)
+
+## Connectors
+
+### Get Slider Value
+
+Obtain the value of a slider and store it.
+
+![Get Slider Value](resources/GetSliderValue.png)
 
 ## States
 
