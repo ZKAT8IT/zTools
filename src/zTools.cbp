@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
+<CodeBlocks_project_file>
+	<FileVersion major="1" minor="6" />
+	<Project>
+		<Option title="zTools" />
+		<Option pch_mode="2" />
+		<Option compiler="gcc" />
+		<Build>
+			<Target title="Debug">
+				<Option output="bin/Debug/zTools" prefix_auto="1" extension_auto="1" />
+				<Option object_output="obj/Debug/" />
+				<Option type="1" />
+				<Option compiler="gcc" />
+				<Compiler>
+					<Add option="-g" />
+				</Compiler>
+			</Target>
+			<Target title="Release">
+				<Option output="bin/Release/zTools" prefix_auto="1" extension_auto="1" />
+				<Option object_output="obj/Release/" />
+				<Option type="1" />
+				<Option compiler="gcc" />
+				<Compiler>
+					<Add option="-O2" />
+					<Add directory="$(#wx.INCLUDE)" />
+					<Add directory="$(#wx.LIB)/gcc_lib/mswu" />
+				</Compiler>
+				<ResourceCompiler>
+					<Add directory="$(#wx.INCLUDE)" />
+					<Add directory="$(#wx.LIB)/gcc_lib/mswu" />
+				</ResourceCompiler>
+				<Linker>
+					<Add option="-s" />
+					<Add library="libwxmsw31u" />
+					<Add library="ole32" />
+					<Add library="psapi" />
+					<Add library="version" />
+					<Add library="ws2_32" />
+					<Add library="gdi32" />
+					<Add library="comdlg32" />
+					<Add library="winspool" />
+					<Add library="uxtheme" />
+					<Add library="uuid" />
+					<Add library="advapi32" />
+					<Add library="shlwapi" />
+					<Add library="user32" />
+					<Add library="shell32" />
+					<Add library="comctl32" />
+					<Add library="oleaut32" />
+					<Add library="wsock32" />
+					<Add library="wxtiff" />
+					<Add library="wxjpeg" />
+					<Add library="wxpng" />
+					<Add library="wxzlib" />
+					<Add library="oleacc" />
+					<Add library="d3d9" />
+					<Add directory="$(#wx.LIB)/gcc_lib" />
+				</Linker>
+			</Target>
+		</Build>
+		<Compiler>
+			<Add option="-Wall" />
+			<Add option="-fexceptions" />
+		</Compiler>
+		<Unit filename="JSON/json_defs.h" />
+		<Unit filename="JSON/jsonreader.cpp" />
+		<Unit filename="JSON/jsonreader.h" />
+		<Unit filename="JSON/jsonval.cpp" />
+		<Unit filename="JSON/jsonval.h" />
+		<Unit filename="JSON/jsonwriter.cpp" />
+		<Unit filename="JSON/jsonwriter.h" />
+		<Unit filename="TPConnection.cpp" />
+		<Unit filename="TPConnection.h" />
+		<Unit filename="main.cpp" />
+		<Unit filename="main.h" />
+		<Extensions>
+			<lib_finder disable_auto="1" />
+		</Extensions>
+	</Project>
+</CodeBlocks_project_file>
