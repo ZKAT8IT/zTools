@@ -17,7 +17,7 @@
     - [Length](#length)
     - [Scrolling Marquee](#scrolling-marquee)
     - [Screen Capture](#screen-capture)
-    - [Window Capture](#window-capture)
+    - [Window Capture ( Beta )](#window-capture)
   - [Events](#events)
     - [Timer](#timer)
   - [Connectors](#connectors)
