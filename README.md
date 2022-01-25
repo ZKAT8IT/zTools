@@ -1,7 +1,5 @@
 # Touch Portal zTools Plugin
 
-![Download](https://github.com/ZKAT8IT/zTools/blob/main/download/zTools-v0.8.tpp)
-
 - [Touch Portal zTools Plugin](#touch-portal-ztools-plugin)
   - [Changelog](#changelog)
   - [Description](#description)
