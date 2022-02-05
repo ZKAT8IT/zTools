@@ -176,7 +176,7 @@ This plugin gives you 10 states of each.
   - opResults - States used to store Operation results.
   - strResults - States used to store String results.
   - sMarquee - Stated used to store Marquee results.
-  - sCapture - States used to store Screen/Window Capture images.
+  - sCapture - States used to store Screen/Window Capture images. ( 20 states )
   - conResult - States used to store Slider values.
 
 ## Issues
