@@ -16,8 +16,7 @@
     - [Ends With](#ends-with)
     - [Length](#length)
     - [Scrolling Marquee](#scrolling-marquee)
-    - [Screen Capture](#screen-capture)
-    - [Window Capture ( Beta )](#window-capture)
+    - [Screen Window Capture](#screen-capture)
   - [Events](#events)
     - [Timer](#timer)
   - [Connectors](#connectors)
@@ -33,6 +32,10 @@
 
 ## Changelog
 ```
+0.9 - Update
+    - Actions
+        - Combined Screen Capture and Window Capture Into 1 Action now.
+        - Fixed Static linking of included libraries, no more required DLL errors.
 0.8 - The initial release
     - Actions
         - Operators - Get a Boolean result comparing 2 values. ( Operators are == , != , >= , <= , > , < , * , / , + , - )
@@ -144,19 +147,12 @@ Returns a portion of the string provided with length set.
 
 ![Scrolling Marquee](resources/ScrollingMarquee.png)
 
-### Screen Capture
+### Screen-Window Capture
 
 Will return a 128x128 Image capture of the screen at designated coordinates.
   - Note: Border Option will make the selected sides transparent by the amount of pixels selected, useful for displaying a border around the image.
 
-![Screen Capture](resources/ScreenCapture.png)
-
-### Window Capture ( Beta )
-
-Will return a 128x128 Image capture of the application at designated coordinates. ( Still In Progress )
-  - Note: Border Option will make the selected sides transparent by the amount of pixels selected, useful for displaying a border around the image.
-
-![Window Capture](resources/WindowCapture.png)
+![Screen Window Capture](resources/WindowCapture.png)
 
 ## Events
 
