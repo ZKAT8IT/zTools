@@ -8,6 +8,8 @@
     - [Operators](#operators)
     - [If Then Operator](#if-then-operator)
     - [If Then Else Operator](#if-then-else-operator)
+    - [If And/Or Then Operator](#if-and-or-then-operator)
+    - [If And/Or Then Else Operator](#if-and-or-then-else-operator)
     - [SubString](#substring)
     - [Mid](#mid)
     - [Left](#left)
@@ -32,6 +34,12 @@
 
 ## Changelog
 ```
+1.0 - Update
+    - Actions
+        - Added If And/Or Then Operator
+        - Added If Ando/or Then Else Operator
+    - Changes
+        - Created Seperate Loop For Processing Events, Should be approx 25x Faster
 0.9 - Update
     - Actions
         - Combined Screen Capture and Window Capture Into 1 Action now.
@@ -81,23 +89,37 @@ This is still being worked on and there may be bugs or unpredictable results.
 ### Operators
 
 Get a Boolean result comparing 2 values. ( 0 for False, 1 for True )
- - Note: If using Text instead of Numbers it will use the length of the Text.
+ - Note: If comparing 2 sets of Text, it will check if they're the same, if only one is Text it will compare the length.
 
 ![Operators](resources/Operators.png)
 
 ### If-Then Operator
 
 Compare 2 Values/States and store a value upon sucess.
- - Note: If using Text instead of Numbers it will use the length of the Text.
+ - Note: If comparing 2 sets of Text, it will check if they're the same, if only one is Text it will compare the length.
 
 ![If Then Operator](resources/IfThenOperator.png)
 
 ### If-Then-Else Operator
 
 Compare 2 Values/States and store a value upon success/fail.
-- Note: If using Text instead of Numbers it will use the length of the Text.
+- Note: If comparing 2 sets of Text, it will check if they're the same, if only one is Text it will compare the length.
 
 ![If Then Else Operator](resources/IfThenElseOperator.png)
+
+### If-And-Or-Then Operator
+
+Compare 2 Values/States with 2 other Values/States and store a value upon sucess.
+ - Note: If comparing 2 sets of Text, it will check if they're the same, if only one is Text it will compare the length.
+
+![If And Or Then Operator](resources/IfAndOrThenOperator.png)
+
+### If-And-Or-Then-Else Operator
+
+Compare 2 Values/States with 2 other Values/States and store a value upon sucess/fail.
+ - Note: If comparing 2 sets of Text, it will check if they're the same, if only one is Text it will compare the length.
+
+![If And Or Then Else Operator](resources/IfAndOrThenElseOperator.png)
 
 ### SubString
 
