@@ -7,6 +7,7 @@ wxIMPLEMENT_APP_CONSOLE(zToolsApp);
 
 wxBEGIN_EVENT_TABLE(zToolsApp, wxAppConsole)
     EVT_TIMER(TIMER_ID, zToolsApp::OnTimer)
+    EVT_TIMER(MAINTIMER_ID, zToolsApp::OnMainTimer)
 wxEND_EVENT_TABLE()
 
 bool zToolsApp::OnInit()
@@ -23,11 +24,35 @@ bool zToolsApp::OnInit()
 int zToolsApp::OnRun()
 {
     MyTimer = new wxTimer(this, TIMER_ID);
+    MainTimer = new wxTimer(this, MAINTIMER_ID);
     MyTPSocket = new TPConnection(wxT("zk_tools"));
+    //GetApplicationInfo();
+
+    CaptureSetup = false;
 
 
+    ClearIcon = new wxImage(128,128);
+    if(!ClearIcon->HasAlpha())
+        ClearIcon->InitAlpha();
+
+    for(int py=0; py < 128; py++)
+        for(int px=0; px < 128; px++)
+            ClearIcon->SetAlpha(px,py,0);
+
+    exeAry.Add(wxT("Screen Capture"));
+    EnumWindows(zToolsApp::enumWindowCallback, reinterpret_cast<LPARAM>(&exeAry));
+    MyTPSocket->UpdateList(wxT("zt_window_01"),exeAry);
+    MyTPSocket->UpdateState(wxT("ClearIcon"),ClearIcon);
+
+    //cout << " here 2 " << endl;
+    //cout << ":size: " << exeAry[5] << endl;
+
+    MainTimer->Start(1);
     MyTimer->Start(25);
+    //MyTimer->Start(1);
     //ProcessTPEvents();
+
+
 
 
 	return wxAppConsole::OnRun();
@@ -49,9 +74,10 @@ void zToolsApp::ProcessTPEvents()
                     wxVector<wxJSONValue>::iterator it = TPData.begin();
                     while(it != TPData.end())
                     {
-                        cout << "Size - " << TPData.size() << endl;
+                        //cout << "Size - " << TPData.size() << endl;
                         wxJSONValue TempVal = TPData.front();
-                        cout << "TPDataType - " << TempVal["type"].AsString().mb_str() << endl;
+                        //cout << "TPDataType - " << TempVal["type"].AsString().mb_str() << endl;
+                        cout << "Data - " << TempVal.AsString().mb_str() << endl;
                         if(TempVal["type"].IsSameAs(wxT("action")))
                         {
                             cout << "here 4" << endl;
@@ -73,6 +99,12 @@ void zToolsApp::ProcessTPEvents()
 
                             if(TempVal["actionId"].IsSameAs(wxT("ztools_ifelse")))
                                 DoIfElseComparison(TempVal["data"][0]["value"].AsString(),TempVal["data"][1]["value"].AsString(),TempVal["data"][2]["value"].AsString(),TempVal["data"][3]["value"].AsString(),TempVal["data"][4]["value"].AsString(),TempVal["data"][5]["value"].AsString(),TempVal["data"][6].AsString());
+
+                            if(TempVal["actionId"].IsSameAs(wxT("ztools_ifandor")))
+                                DoIfAndOrComparison(TempVal["data"][0]["value"].AsString(),TempVal["data"][1]["value"].AsString(),TempVal["data"][2]["value"].AsString(),TempVal["data"][3]["value"].AsString(),TempVal["data"][4]["value"].AsString(),TempVal["data"][5]["value"].AsString(),TempVal["data"][6]["value"].AsString(),TempVal["data"][7]["value"].AsString(),TempVal["data"][8]["value"].AsString());
+
+                            if(TempVal["actionId"].IsSameAs(wxT("ztools_ifandorelse")))
+                                DoIfAndOrElseComparison(TempVal["data"][0]["value"].AsString(),TempVal["data"][1]["value"].AsString(),TempVal["data"][2]["value"].AsString(),TempVal["data"][3]["value"].AsString(),TempVal["data"][4]["value"].AsString(),TempVal["data"][5]["value"].AsString(),TempVal["data"][6]["value"].AsString(),TempVal["data"][7]["value"].AsString(),TempVal["data"][8]["value"].AsString(),TempVal["data"][9]["value"].AsString(),TempVal["data"][10]["value"].AsString());
 
                             if(TempVal["actionId"].IsSameAs(wxT("ztools_substring")))
                                 SubString(TempVal["data"][0]["value"].AsString(),TempVal["data"][1]["value"].AsString(),TempVal["data"][2]["value"].AsString(),TempVal["data"][3]["value"].AsString());
@@ -100,8 +132,14 @@ void zToolsApp::ProcessTPEvents()
                             if(TempVal["actionId"].IsSameAs(wxT("ztools_smarquee")))
                                 ScrollingMarquee(TempVal["data"][0]["value"].AsString(),TempVal["data"][1]["value"].AsString(),TempVal["data"][2]["value"].AsString());
 
-                            if(TempVal["actionId"].IsSameAs(wxT("ztools_screencapture")))
-                                ScreenCapture(TempVal["data"][0]["value"].AsString(),TempVal["data"][1]["value"].AsString(),TempVal["data"][2]["value"].AsString(),TempVal["data"][3]["value"].AsString(),TempVal["data"][4]["value"].AsString());
+                            //if(TempVal["actionId"].IsSameAs(wxT("ztools_screencapture")))
+                            //    ScreenCapture(TempVal["data"][0]["value"].AsString(),TempVal["data"][1]["value"].AsString(),TempVal["data"][2]["value"].AsString(),TempVal["data"][3]["value"].AsString(),TempVal["data"][4]["value"].AsString());
+                            //if(TempVal["actionId"].IsSameAs(wxT("ztools_windowcapture")))
+                            //    WindowCapture(TempVal["data"][0]["value"].AsString(),TempVal["data"][1]["value"].AsString(),TempVal["data"][2]["value"].AsString(),TempVal["data"][3]["value"].AsString(),TempVal["data"][4]["value"].AsString(),TempVal["data"][5]["value"].AsString());
+                            if(TempVal["actionId"].IsSameAs(wxT("ztools_screenwindowcapture")))
+                                ScreenWindowCapture(TempVal["data"][0]["value"].AsString(),TempVal["data"][1]["value"].AsString(),TempVal["data"][2]["value"].AsString(),TempVal["data"][3]["value"].AsString(),TempVal["data"][4]["value"].AsString(),TempVal["data"][5]["value"].AsString());
+
+
 
                             //if(TempVal["connectorId"].IsSameAs(wxT("ztools_advancedslider")))
                             //    cout << TempVal["data"][0]["value"].AsString().mb_str() << endl;
@@ -112,14 +150,29 @@ void zToolsApp::ProcessTPEvents()
 
                             //aValues.Clear();
                         }
+                        if(TempVal["type"].IsSameAs(wxT("shortConnectorIdNotification")))
+                        {
+                            cout << "Short ID Generated" << endl;
+                            ShortID = TempVal["shortID"].AsString();
+                        }
                         if(TempVal["type"].IsSameAs(wxT("connectorChange")))
                         {
                             if(TempVal["connectorId"].IsSameAs(wxT("ztools_getslidervalue")))
                             {
-                                cout << "SValue 1 - " << TempVal["data"][0]["value"].AsString().mb_str() << endl;
+                                //cout << "SValue 1 - " << TempVal["data"][0]["value"].AsString().mb_str() << endl;
                                 GetSliderValue(TempVal["data"][0]["value"].AsString(),TempVal["value"].AsString());
                             }
-
+                            if(TempVal["connectorId"].IsSameAs(wxT("ztools_linksliders")))
+                            {
+                                cout << "SValue 1 - " << TempVal["data"][0]["value"].AsString().mb_str() << endl;
+                                LinkSliders(TempVal["data"][0]["value"].AsString(),TempVal["data"][1]["value"].AsString(),TempVal["value"].AsString());
+                            }
+                        }
+                        if(TempVal["type"].IsSameAs(wxT("down")))
+                        {
+                        }
+                        if(TempVal["type"].IsSameAs(wxT("up")))
+                        {
                         }
                         it = TPData.erase(it);
                         //TPData.pop_back();
@@ -152,19 +205,31 @@ void zToolsApp::GetSliderValue(wxString id, wxString val)
     MyTPSocket->UpdateState(id,val);
 }
 
-void zToolsApp::AdvancedSlider(wxString val1, wxString val2, wxString val3)
+void zToolsApp::LinkSliders(wxString sub, wxString t, wxString val)
 {
+    if(t.IsSameAs(wxT("MainOverride")))
+    {
+        cout << "Connect Override - " << ShortID.mb_str() << endl;
+        //MyTPSocket->UpdateConnector(sub,val);
+        MyTPSocket->UpdateConnector(wxT("pc_zk_tools_ztools_linksliders|sliderid=") + sub + wxT("|sliderlinktype=") + t,val);
+    }
+}
 
+void zToolsApp::OnMainTimer(wxTimerEvent& event)
+{
+    ProcessTPEvents();
 }
 
 void zToolsApp::OnTimer(wxTimerEvent& event)
 {
-    ProcessTPEvents();
+    //ProcessTPEvents();
+
 
     for(int i = 0; i < 12; i++)
         tLoopCount[i]++;
 
     if(tLoopCount[2] == 4)
+    //if(tLoopCount[2] == 100)
     {
         for(int i2 = 0; i2 < 10; i2++)
         {
@@ -186,6 +251,7 @@ void zToolsApp::OnTimer(wxTimerEvent& event)
             }
         }
     }
+
 
     if(tLoopCount[0] == 1)
         { MyTPSocket->UpdateStateArray(wxT("tTimer0"),wxT("25")); tLoopCount[0] = 0; }
@@ -212,7 +278,39 @@ void zToolsApp::OnTimer(wxTimerEvent& event)
     if(tLoopCount[11] == 40)
         { MyTPSocket->UpdateStateArray(wxT("tTimer0"),wxT("1000")); tLoopCount[11] = 0; }
 
+
+    /*
+    bool SendArray = false;
+
+    if(tLoopCount[0] == 25)
+        { MyTPSocket->UpdateStateArray(wxT("tTimer0"),wxT("25")); tLoopCount[0] = 0; SendArray = true; }
+    if(tLoopCount[1] == 50)
+        { MyTPSocket->UpdateStateArray(wxT("tTimer0"),wxT("50")); tLoopCount[1] = 0; SendArray = true; }
+    if(tLoopCount[2] == 100)
+        { MyTPSocket->UpdateStateArray(wxT("tTimer0"),wxT("100")); tLoopCount[2] = 0; SendArray = true; }
+    if(tLoopCount[3] == 200)
+        { MyTPSocket->UpdateStateArray(wxT("tTimer0"),wxT("200")); tLoopCount[3] = 0; SendArray = true; }
+    if(tLoopCount[4] == 300)
+        { MyTPSocket->UpdateStateArray(wxT("tTimer0"),wxT("300")); tLoopCount[4] = 0; SendArray = true; }
+    if(tLoopCount[5] == 400)
+        { MyTPSocket->UpdateStateArray(wxT("tTimer0"),wxT("400")); tLoopCount[5] = 0; SendArray = true; }
+    if(tLoopCount[6] == 500)
+        { MyTPSocket->UpdateStateArray(wxT("tTimer0"),wxT("500")); tLoopCount[6] = 0; SendArray = true; }
+    if(tLoopCount[7] == 600)
+        { MyTPSocket->UpdateStateArray(wxT("tTimer0"),wxT("600")); tLoopCount[7] = 0; SendArray = true; }
+    if(tLoopCount[8] == 700)
+        { MyTPSocket->UpdateStateArray(wxT("tTimer0"),wxT("700")); tLoopCount[8] = 0; SendArray = true; }
+    if(tLoopCount[9] == 800)
+        { MyTPSocket->UpdateStateArray(wxT("tTimer0"),wxT("800")); tLoopCount[9] = 0; SendArray = true; }
+    if(tLoopCount[10] == 900)
+        { MyTPSocket->UpdateStateArray(wxT("tTimer0"),wxT("900")); tLoopCount[10] = 0; SendArray = true; }
+    if(tLoopCount[11] == 1000)
+        { MyTPSocket->UpdateStateArray(wxT("tTimer0"),wxT("1000")); tLoopCount[11] = 0; SendArray = true; }
+
     // do whatever you want to do every second here
+    if(SendArray)
+        MyTPSocket->SendStateArray();
+    */
     MyTPSocket->SendStateArray();
 }
 
@@ -441,6 +539,288 @@ void zToolsApp::DoIfElseComparison(wxString value1, wxString oper, wxString valu
     }
 }
 
+void zToolsApp::DoIfAndOrComparison(wxString value1, wxString oper, wxString value2, wxString ao, wxString value3, wxString oper2, wxString value4, wxString result1, wxString store1)
+{
+    long num1, num2, num3, num4;
+    bool Is1String, Is2String, Is3String, Is4String;
+    Is1String = false; Is2String = false; Is3String = false; Is4String = false;
+
+    //Convert Strings To Numbers
+    if(value1.IsNumber()) {
+        value1.ToLong(&num1); }
+    else {
+        Is1String = true; value1.Length(); }
+    if(value2.IsNumber()) {
+        value2.ToLong(&num2); }
+    else {
+        Is2String = true; value2.Length(); }
+    if(value3.IsNumber()) {
+        value3.ToLong(&num3); }
+    else {
+        Is3String = true; value3.Length(); }
+    if(value4.IsNumber()) {
+        value4.ToLong(&num4); }
+    else {
+        Is4String = true; value4.Length(); }
+
+    bool Operation1 = false;
+    bool Operation2 = false;
+
+    if(oper.IsSameAs(wxT("==")))
+    {
+        if(Is1String == true && Is2String == true)
+        {
+            if(value1.IsSameAs(value2))
+                Operation1 = true;
+        }
+        else
+        {
+            if(num1 == num2)
+                Operation1 = true;
+        }
+    }
+    if(oper.IsSameAs(wxT("!=")))
+    {
+        if(Is1String == true && Is2String == true)
+        {
+            if(!value1.IsSameAs(value2))
+                Operation1 = true;
+        }
+        else
+        {
+            if(num1 != num2)
+                Operation1 = true;
+        }
+    }
+    if(oper.IsSameAs(wxT(">=")))
+    {
+        if(num1 >= num2)
+            Operation1 = true;
+    }
+    if(oper.IsSameAs(wxT("<=")))
+    {
+        if(num1 <= num2)
+            Operation1 = true;
+    }
+    if(oper.IsSameAs(wxT(">")))
+    {
+        if(num1 > num2)
+            Operation1 = true;
+    }
+    if(oper.IsSameAs(wxT("<")))
+    {
+        if(num1 < num2)
+            Operation1 = true;
+    }
+
+    if(oper2.IsSameAs(wxT("==")))
+    {
+        if(Is3String == true && Is4String == true)
+        {
+            if(value3.IsSameAs(value4))
+                Operation2 = true;
+        }
+        else
+        {
+            if(num3 == num4)
+                Operation2 = true;
+        }
+    }
+    if(oper2.IsSameAs(wxT("!=")))
+    {
+        if(Is3String == true && Is4String == true)
+        {
+            if(!value3.IsSameAs(value4))
+                Operation2 = true;
+        }
+        else
+        {
+            if(num3 != num4)
+                Operation2 = true;
+        }
+    }
+    if(oper2.IsSameAs(wxT(">=")))
+    {
+        if(num3 >= num4)
+            Operation2 = true;
+    }
+    if(oper2.IsSameAs(wxT("<=")))
+    {
+        if(num3 <= num4)
+            Operation2 = true;
+    }
+    if(oper2.IsSameAs(wxT(">")))
+    {
+        if(num3 > num4)
+            Operation2 = true;
+    }
+    if(oper2.IsSameAs(wxT("<")))
+    {
+        if(num3 < num4)
+            Operation2 = true;
+    }
+
+    if(ao.IsSameAs(wxT("And")))
+    {
+        if(Operation1 == true && Operation2 == true)
+        {
+            MyTPSocket->UpdateState(result1,store1);
+        }
+    }
+    if(ao.IsSameAs(wxT("Or")))
+    {
+        if(Operation1 == true || Operation2 == true)
+        {
+            MyTPSocket->UpdateState(result1,store1);
+        }
+    }
+}
+
+void zToolsApp::DoIfAndOrElseComparison(wxString value1, wxString oper, wxString value2, wxString ao, wxString value3, wxString oper2, wxString value4, wxString result1, wxString store1, wxString result2, wxString store2)
+{
+    long num1, num2, num3, num4;
+    bool Is1String, Is2String, Is3String, Is4String;
+    Is1String = false; Is2String = false; Is3String = false; Is4String = false;
+
+    //Convert Strings To Numbers
+    if(value1.IsNumber()) {
+        value1.ToLong(&num1); }
+    else {
+        Is1String = true; value1.Length(); }
+    if(value2.IsNumber()) {
+        value2.ToLong(&num2); }
+    else {
+        Is2String = true; value2.Length(); }
+    if(value3.IsNumber()) {
+        value3.ToLong(&num3); }
+    else {
+        Is3String = true; value3.Length(); }
+    if(value4.IsNumber()) {
+        value4.ToLong(&num4); }
+    else {
+        Is4String = true; value4.Length(); }
+
+    bool Operation1 = false;
+    bool Operation2 = false;
+
+    if(oper.IsSameAs(wxT("==")))
+    {
+        if(Is1String == true && Is2String == true)
+        {
+            if(value1.IsSameAs(value2))
+                Operation1 = true;
+        }
+        else
+        {
+            if(num1 == num2)
+                Operation1 = true;
+        }
+    }
+    if(oper.IsSameAs(wxT("!=")))
+    {
+        if(Is1String == true && Is2String == true)
+        {
+            if(!value1.IsSameAs(value2))
+                Operation1 = true;
+        }
+        else
+        {
+            if(num1 != num2)
+                Operation1 = true;
+        }
+    }
+    if(oper.IsSameAs(wxT(">=")))
+    {
+        if(num1 >= num2)
+            Operation1 = true;
+    }
+    if(oper.IsSameAs(wxT("<=")))
+    {
+        if(num1 <= num2)
+            Operation1 = true;
+    }
+    if(oper.IsSameAs(wxT(">")))
+    {
+        if(num1 > num2)
+            Operation1 = true;
+    }
+    if(oper.IsSameAs(wxT("<")))
+    {
+        if(num1 < num2)
+            Operation1 = true;
+    }
+
+    if(oper2.IsSameAs(wxT("==")))
+    {
+        if(Is3String == true && Is4String == true)
+        {
+            if(value3.IsSameAs(value4))
+                Operation2 = true;
+        }
+        else
+        {
+            if(num3 == num4)
+                Operation2 = true;
+        }
+    }
+    if(oper2.IsSameAs(wxT("!=")))
+    {
+        if(Is3String == true && Is4String == true)
+        {
+            if(!value3.IsSameAs(value4))
+                Operation2 = true;
+        }
+        else
+        {
+            if(num3 != num4)
+                Operation2 = true;
+        }
+    }
+    if(oper2.IsSameAs(wxT(">=")))
+    {
+        if(num3 >= num4)
+            Operation2 = true;
+    }
+    if(oper2.IsSameAs(wxT("<=")))
+    {
+        if(num3 <= num4)
+            Operation2 = true;
+    }
+    if(oper2.IsSameAs(wxT(">")))
+    {
+        if(num3 > num4)
+            Operation2 = true;
+    }
+    if(oper2.IsSameAs(wxT("<")))
+    {
+        if(num3 < num4)
+            Operation2 = true;
+    }
+
+    if(ao.IsSameAs(wxT("And")))
+    {
+        if(Operation1 == true && Operation2 == true)
+        {
+            MyTPSocket->UpdateState(result1,store1);
+        }
+        else
+        {
+            MyTPSocket->UpdateState(result2,store2);
+        }
+    }
+    if(ao.IsSameAs(wxT("Or")))
+    {
+        if(Operation1 == true || Operation2 == true)
+        {
+            MyTPSocket->UpdateState(result1,store1);
+        }
+        else
+        {
+            MyTPSocket->UpdateState(result2,store2);
+        }
+    }
+}
+
 void zToolsApp::SubString(wxString r, wxString str, wxString s, wxString c)
 {
     if(c.IsNumber() && s.IsNumber())
@@ -451,7 +831,6 @@ void zToolsApp::SubString(wxString r, wxString str, wxString s, wxString c)
         MyTPSocket->UpdateState(r,str.SubString(num,num2));
     }
 }
-
 
 void zToolsApp::Mid(wxString r, wxString str, wxString s, wxString c)
 {
@@ -577,97 +956,316 @@ void zToolsApp::ScrollingMarquee(wxString r, wxString str, wxString ln)
     MyTPSocket->UpdateState(r,str.Left(tempLn));
 }
 
-void zToolsApp::ScreenCapture(wxString r, wxString x, wxString y, wxString b, wxString bp)
-{
-    if(x.IsNumber() && y.IsNumber())
-    {
-        wxScreenDC* MyScreen = new wxScreenDC();
+BOOL zToolsApp::enumWindowCallback(HWND hWnd, LPARAM lparam) {
+    wxArrayString& tempAry = *reinterpret_cast<wxArrayString*>(lparam);
 
-        long lx,ly, lbp;
-        x.ToLong(&lx);
-        y.ToLong(&ly);
-        bp.ToLong(&lbp);
+    int length = GetWindowTextLength(hWnd);
+    char* buffer = new char[length + 1];
+    GetWindowTextA(hWnd, buffer, length + 1);
+    wxString windowTitle = wxString::FromUTF8(buffer);
+    delete(buffer);
 
-        //Create a Bitmap that will later on hold the screenshot image
-        //Note that the Bitmap must have a size big enough to hold the screenshot
-        //-1 means using the current default colour depth
-        //wxBitmap screenshot(screenWidth, screenHeight,-1);
-        wxBitmap* screenshot = new wxBitmap(128, 128);
+    //Get Exe Name
+    TCHAR buffer2[MAX_PATH] = {0};
+    DWORD dwProcId = 0;
 
-        //Create a memory DC that will be used for actually taking the screenshot
-        wxMemoryDC* memDC = new wxMemoryDC();
-        //Tell the memory DC to use our Bitmap
-        //all drawing action on the memory DC will go to the Bitmap now
-        memDC->SelectObject(*screenshot);
-        //Blit (in this case copy) the actual screen on the memory DC
-        //and thus the Bitmap
-        memDC->Blit( 0, //Copy to this X coordinate
-                    0, //Copy to this Y coordinate
-                    128, //Copy this width
-                    128, //Copy this height
-                    MyScreen, //From where do we copy?
-                    lx, //What's the X offset in the original DC?
-                    ly  //What's the Y offset in the original DC?
-                );
-        //Select the Bitmap out of the memory DC by selecting a new
-        //uninitialized Bitmap
-        memDC->SelectObject(wxNullBitmap);
+    GetWindowThreadProcessId(hWnd, &dwProcId);
 
-        //Convert To wxImage
-        //wxImage buttonImage = screenshot.ConvertToImage();
-        //buttonImage.InitAlpha();
-
-        if(screenshot->IsOk())
-        {
-            wxImage buttonImage = screenshot->ConvertToImage();
-
-            if(!buttonImage.HasAlpha())
-                buttonImage.InitAlpha();
-
-            //if(b.IsSameAs(wxT("Top")))
-            if(b.Find(wxT("Top")) > -1 || b.IsSameAs(wxT("All")))
-            {
-                for(int py=0; py < lbp; py++)
-                    for(int px=0; px < 128; px++)
-                        buttonImage.SetAlpha(px,py,0);
-            }
-            if(b.Find(wxT("Bottom")) > -1 || b.IsSameAs(wxT("All")))
-            {
-                for(int py=(128-lbp); py < 128; py++)
-                    for(int px=0; px < 128; px++)
-                        buttonImage.SetAlpha(px,py,0);
-            }
-            if(b.Find(wxT("Left")) > -1 || b.IsSameAs(wxT("All")))
-            {
-                for(int px=0; px < lbp; px++)
-                    for(int py=0; py < 128; py++)
-                        buttonImage.SetAlpha(px,py,0);
-            }
-            if(b.Find(wxT("Right")) > -1 || b.IsSameAs(wxT("All")))
-            {
-                for(int px=(128-lbp); px < 128; px++)
-                    for(int py=0; py < 128; py++)
-                        buttonImage.SetAlpha(px,py,0);
-            }
-
-            //wxMemoryOutputStream* memOutputStream = new wxMemoryOutputStream();
-            //buttonImage.SaveFile(*memOutputStream,wxBITMAP_TYPE_PNG);
-
-            //wxMemoryBuffer* memBuffer = new wxMemoryBuffer();
-            //memBuffer->SetBufSize(memOutputStream->GetSize());
-            //memBuffer->SetDataLen(memOutputStream->GetSize());
-            //memOutputStream->CopyTo(memBuffer->GetData(), memBuffer->GetDataLen());
-
-            //MyTPSocket->UpdateState(r,memBuffer);
-
-            MyTPSocket->UpdateState(r,&buttonImage);
-
-            buttonImage.Destroy();
-            //delete(memOutputStream);
-            //delete(memBuffer);
-        }
-        delete(MyScreen);
-        delete(screenshot);
-        delete(memDC);
+    HANDLE hProc = OpenProcess(PROCESS_QUERY_INFORMATION | PROCESS_VM_READ , FALSE, dwProcId);
+    //GetModuleFileName((HMODULE)hProc, buffer2, MAX_PATH);
+    GetModuleFileNameEx(hProc, NULL, buffer2, MAX_PATH);
+    CloseHandle(hProc);
+    wxString exeTitle(buffer2);
+    // List visible windows with a non-empty title
+    if (IsWindowVisible(hWnd) && length != 0) {
+        if(windowTitle.Find('\\') > 0)
+            windowTitle.Replace(wxT("\\"),wxT("\\\\"),true);
+        //wxString h = wxString::Format(wxT("%p"),hWnd);
+        tempAry.Add(wxT("[") + exeTitle.AfterLast(wxT('\\')) + wxT("] ") + windowTitle);
+        //tempAry.Add(wxT("[") + exeTitle.AfterLast(wxT('\\')) + wxT("] ") + windowTitle + wxT(" [") + h + wxT("]"));
     }
+    return TRUE;
+}
+
+void zToolsApp::GetApplicationInfo()
+{
+    DWORD aProcesses[1024], cbNeeded, cProcesses;
+    unsigned int i;
+    TCHAR szProcessName[MAX_PATH] = TEXT("<unknown>");
+    wxArrayString myAry;
+
+    if ( !EnumProcesses( aProcesses, sizeof(aProcesses), &cbNeeded ) )
+        return;
+
+    cProcesses = cbNeeded / sizeof(DWORD);
+
+    for ( i = 0; i < cProcesses; i++ )
+    {
+        if( aProcesses[i] != 0 )
+        {
+            //PrintProcessNameAndID( aProcesses[i] );
+            HANDLE hProcess = OpenProcess( PROCESS_QUERY_INFORMATION | PROCESS_VM_READ, FALSE, aProcesses[i] );
+            if (NULL != hProcess )
+            {
+                HMODULE hMod;
+                DWORD cbNeeded;
+
+                if ( EnumProcessModules( hProcess, &hMod, sizeof(hMod), &cbNeeded) )
+                {
+                    GetModuleBaseName( hProcess, hMod, szProcessName, sizeof(szProcessName)/sizeof(TCHAR) );
+                    wxString exeName(szProcessName);
+                    myAry.Add(exeName);
+                    //wxString handleName
+                }
+            }
+            CloseHandle( hProcess );
+        }
+    }
+    MyTPSocket->UpdateList(wxT("zt_window_01"),myAry);
+}
+void zToolsApp::SetupCapture()
+{
+    CaptureSetup = true;
+    screenshot = new wxBitmap(128,128);
+    buttonImage = new wxImage(128,128);
+    parentWindow = new wxWindow();
+    myScreenDC = new wxScreenDC();
+    memScreenDC = new wxMemoryDC();
+    memWindowDC = new wxMemoryDC();
+}
+
+void zToolsApp::ScreenWindowCapture(wxString r, wxString app, wxString x, wxString y, wxString b, wxString bp)
+{
+    if(!CaptureSetup)
+        SetupCapture();
+
+    cout << "Made It Past Setup" << endl;
+
+    if(!app.IsEmpty())
+    {
+        if(x.IsNumber() && y.IsNumber())
+        {
+            x.ToLong(&lx);
+            y.ToLong(&ly);
+            bp.ToLong(&lbp);
+
+            if(app.IsSameAs(wxT("Screen Capture")))
+            {
+                cout << "Desktop Found" << endl;
+                memScreenDC->SelectObject(*screenshot);
+                memScreenDC->Blit(0, 0, 128, 128, myScreenDC, lx, ly);
+                memScreenDC->SelectObject(wxNullBitmap);
+            }
+            else
+            {
+                wxString windowTitle = app.AfterFirst(']');
+                windowTitle.Trim(true); windowTitle.Trim(false);
+
+                //RECT rc;
+
+                HWND appHWND = FindWindow(NULL,windowTitle);
+
+                if (appHWND == NULL)
+                {
+                    cout << "it can't find any 'note' window" << endl;
+                    return;
+                }
+                GetClientRect(appHWND, &rc);
+
+                if((lx+128) > (rc.right - rc.left) || (ly+128) > rc.bottom - rc.top)
+                    return;
+
+                memWindowDC->SelectObject(*screenshot);
+                if(!oldTitle.IsSameAs(windowTitle))
+                {
+                    if(parentWindow)
+                        delete(parentWindow);
+                    parentWindow = new wxWindow();
+                    parentWindow->SetHWND(appHWND);
+                    myWindowDC = new wxClientDC(parentWindow);
+                }
+
+                PrintWindow(appHWND, myWindowDC->GetHDC(), 3);
+                memWindowDC->Blit( 0, 0, 128, 128, myWindowDC, lx, ly);
+                memWindowDC->SelectObject(wxNullBitmap);
+
+                oldTitle = windowTitle;
+                oldHWND = appHWND;
+            }
+
+
+            *buttonImage = screenshot->ConvertToImage();
+
+            if(buttonImage->IsOk())
+            {
+                if(!buttonImage->HasAlpha())
+                    buttonImage->InitAlpha();
+
+                if(b.Find(wxT("Top")) > -1 || b.IsSameAs(wxT("All")))
+                {
+                    for(int py=0; py < lbp; py++)
+                        for(int px=0; px < 128; px++)
+                            buttonImage->SetAlpha(px,py,0);
+                }
+                if(b.Find(wxT("Bottom")) > -1 || b.IsSameAs(wxT("All")))
+                {
+                    for(int py=(128-lbp); py < 128; py++)
+                        for(int px=0; px < 128; px++)
+                            buttonImage->SetAlpha(px,py,0);
+                }
+                if(b.Find(wxT("Left")) > -1 || b.IsSameAs(wxT("All")))
+                {
+                    for(int px=0; px < lbp; px++)
+                        for(int py=0; py < 128; py++)
+                            buttonImage->SetAlpha(px,py,0);
+                }
+                if(b.Find(wxT("Right")) > -1 || b.IsSameAs(wxT("All")))
+                {
+                    for(int px=(128-lbp); px < 128; px++)
+                        for(int py=0; py < 128; py++)
+                            buttonImage->SetAlpha(px,py,0);
+                }
+
+                MyTPSocket->UpdateState(r,buttonImage);
+
+                //buttonImage->Destroy();
+            }
+        }
+    }
+}
+
+
+
+//void ChangeAppVolume(int ArgCount, char* AppList)
+void zToolsApp::ChangeAppVolume(wxString AppName, float incVol)
+{
+    HRESULT hr=NULL;
+    int nSessionCount;
+    DWORD procID;
+
+    CoInitialize(NULL);
+    IMMDeviceEnumerator *deviceEnumerator = NULL;
+    hr = CoCreateInstance(__uuidof(MMDeviceEnumerator), NULL, CLSCTX_INPROC_SERVER, __uuidof(IMMDeviceEnumerator), (LPVOID *)&deviceEnumerator);
+    IMMDevice *defaultDevice = NULL;
+
+    hr = deviceEnumerator->GetDefaultAudioEndpoint(eRender, eConsole, &defaultDevice);
+
+    deviceEnumerator->Release();
+    deviceEnumerator = NULL;
+
+    IAudioSessionManager2* pAudioSessionManager2;
+    hr = defaultDevice->Activate(__uuidof(IAudioSessionManager2), CLSCTX_ALL, NULL, (VOID**) &pAudioSessionManager2);
+    IAudioSessionEnumerator* pAudioSessionEnumerator;
+    hr = pAudioSessionManager2->GetSessionEnumerator(&pAudioSessionEnumerator);
+    pAudioSessionEnumerator->GetCount(&MixerAppCount);
+
+
+    cout << MixerAppCount << endl;
+
+    IAudioSessionControl* pSessionControl = NULL;
+    IAudioSessionControl2* pSessionControl2 = NULL;
+    LPWSTR pswSession = NULL;
+
+    for (int index = 0 ; index < MixerAppCount ; index++)
+    {
+        CoTaskMemFree(pswSession);
+        SAFE_RELEASE(pSessionControl);
+
+        hr = pAudioSessionEnumerator->GetSession(index, &pSessionControl);
+
+        hr = pSessionControl->QueryInterface(__uuidof(IAudioSessionControl2), (void**) &pSessionControl2);
+        hr = pSessionControl2->GetDisplayName(&pswSession);
+        wcout << "Process Name Identifier: " << pswSession << endl;
+        //printf(("Session Index , \"%s\"\n"), pswSession);
+
+        if(pswSession[0] == '@')
+        {
+            cout << "Notifications Found!" << endl;
+            MixerApps[index].szProcessName = "Windows Notifications";
+            cout << MixerApps[index].szProcessName << endl;
+            MixerApps[index].procID = 0;
+        }
+
+
+        hr = pSessionControl2->GetProcessId(&procID);
+        TCHAR szProcessName[MAX_PATH] = TEXT("<unknown>");
+
+        if (NULL != procID ) {
+            HMODULE hMod;
+            DWORD cbNeeded;
+            HANDLE hProcess = OpenProcess(PROCESS_ALL_ACCESS | PROCESS_QUERY_INFORMATION | PROCESS_VM_READ, FALSE, procID);
+            if(GetModuleBaseName(hProcess, hMod, szProcessName, sizeof(szProcessName)/sizeof(*szProcessName)) == 0 ) {
+                //if(pSessionControl2->IsSystemSoundsSession())
+                //    cout << "System Sound" << endl;
+                cout << "Process Name: Error" << endl;
+            } else {
+                MixerApps[index].procID = procID;
+                //string tmp = szProcessName;
+                wxString tmp(szProcessName);
+                MixerApps[index].szProcessName = tmp;
+                cout << "Process ID Name: " << MixerApps[index].szProcessName << endl;
+                cout << "Process ID: " << MixerApps[index].procID << endl;
+
+                wxString tempName(MixerApps[index].szProcessName);
+                cout << "TempName - " << tempName << endl;
+                if(tempName.Lower().IsSameAs(AppName.Lower()))
+                {
+                    //Hope It Works
+                    ISimpleAudioVolume *pSimpleAudioVolume = NULL;
+                    hr = pSessionControl2->QueryInterface(__uuidof(ISimpleAudioVolume), (void**) &pSimpleAudioVolume);
+                    //hr = pSimpleAudioVolume->SetMute(false,NULL);
+                    //hr = pSimpleAudioVolume->SetMasterVolume(1.0f,NULL);
+                    cout << "Changed Volume" << endl;
+                    float curVol;
+                    pSimpleAudioVolume->GetMasterVolume(&curVol);
+                    hr = pSimpleAudioVolume->SetMasterVolume(curVol+(incVol/100.0f),NULL);
+                    cout << "CurVol = " << curVol << endl;
+                    //hr = pSimpleAudioVolume->SetMasterVolume(0.5f,NULL);
+                }
+            }
+        }
+    }
+
+    CoTaskMemFree(pswSession);
+
+    CoUninitialize();
+}
+
+void zToolsApp::ChangeMainVolume(float nVolume)
+{
+    CoInitialize(NULL);
+    HRESULT hr=NULL;
+
+
+    IMMDeviceEnumerator *deviceEnumerator = NULL;
+    hr = CoCreateInstance(__uuidof(MMDeviceEnumerator), NULL, CLSCTX_INPROC_SERVER, __uuidof(IMMDeviceEnumerator), (LPVOID *)&deviceEnumerator);
+    IMMDevice *defaultDevice = NULL;
+    hr = deviceEnumerator->GetDefaultAudioEndpoint(eRender, eConsole, &defaultDevice);
+
+    IAudioEndpointVolume *endpointVolume = NULL;
+    hr = defaultDevice->Activate(__uuidof(IAudioEndpointVolume), CLSCTX_INPROC_SERVER, NULL, (LPVOID *)&endpointVolume);
+    defaultDevice->Release();
+    defaultDevice = NULL;
+
+
+    float currentVolume = 0;
+    hr = endpointVolume->GetMasterVolumeLevel(&currentVolume);
+
+    hr = endpointVolume->GetMasterVolumeLevelScalar(&currentVolume);
+
+    //if (bScalar==false)
+    //{
+        hr = endpointVolume->SetMasterVolumeLevel(nVolume, NULL);
+    //}
+    //else if (bScalar==true)
+    //{
+        hr = endpointVolume->SetMasterVolumeLevelScalar(nVolume, NULL);
+    //}
+
+    endpointVolume->Release();
+
+    CoUninitialize();
+
+
+    //return FALSE;
 }

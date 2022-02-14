@@ -22,6 +22,7 @@
 				<Option compiler="gcc" />
 				<Compiler>
 					<Add option="-O2" />
+					<Add option="-DwxUSE_WXDIB" />
 					<Add directory="$(#wx.INCLUDE)" />
 					<Add directory="$(#wx.LIB)/gcc_lib/mswu" />
 				</Compiler>
@@ -54,6 +55,7 @@
 					<Add library="wxzlib" />
 					<Add library="oleacc" />
 					<Add library="d3d9" />
+					<Add library="wxregexu" />
 					<Add directory="$(#wx.LIB)/gcc_lib" />
 				</Linker>
 			</Target>
@@ -62,6 +64,9 @@
 			<Add option="-Wall" />
 			<Add option="-fexceptions" />
 		</Compiler>
+		<Linker>
+			<Add option="-static" />
+		</Linker>
 		<Unit filename="JSON/json_defs.h" />
 		<Unit filename="JSON/jsonreader.cpp" />
 		<Unit filename="JSON/jsonreader.h" />

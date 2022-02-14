@@ -40,6 +40,9 @@ class TPConnection : public wxSocketClient
         wxVector<wxJSONValue> MyJSONValues;
         wxJSONValue MyJSONVal;
 
+        //wxMemoryOutputStream* memOutputStream;
+        //wxMemoryBuffer* memBuffer;
+
     public:
         TPConnection() {};
         TPConnection(wxString);

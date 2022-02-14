@@ -5419,17 +5419,27 @@
 	"json_defs.h"
 	"jsonval.h"
 
-1643133275 source:f:\projects\codeblocks\ztools\main.cpp
+1644080841 source:f:\projects\codeblocks\ztools\main.cpp
 	"main.h"
 	"TPConnection.h"
 
-1643087672 f:\projects\codeblocks\ztools\main.h
+1644013827 f:\projects\codeblocks\ztools\main.h
 	<wx/wxprec.h>
 	"TPConnection.h"
 	"JSON/jsonval.h"
+	<wx/clipbrd.h>
+	<windows.h>
+	<psapi.h>
+	<wx/msw/dib.h>
+	<wx/webview.h>
+	<audiopolicy.h>
+	<mmdeviceapi.h>
+	<endpointvolume.h>
+	<wx/dcclient.h>
+	<wx/webview.h>
 	<wx/wx.h>
 
-1642016529 f:\projects\codeblocks\ztools\tpconnection.h
+1644012902 f:\projects\codeblocks\ztools\tpconnection.h
 	<wx/wxprec.h>
 	<wx/app.h>
 	<wx/socket.h>
@@ -5474,6 +5484,79 @@
 	<wx/arrstr.h>
 	"json_defs.h"
 
-1642016548 source:f:\projects\codeblocks\ztools\tpconnection.cpp
+1644846122 source:f:\projects\codeblocks\ztools\tpconnection.cpp
 	"TPConnection.h"
+
+1544370008 f:\projects\wxwidgets-3.1.2\include\wx\clipbrd.h
+	"wx/defs.h"
+	"wx/event.h"
+	"wx/chartype.h"
+	"wx/dataobj.h"
+	"wx/vector.h"
+	"wx/msw/clipbrd.h"
+	"wx/motif/clipbrd.h"
+	"wx/gtk/clipbrd.h"
+	"wx/gtk1/clipbrd.h"
+	"wx/x11/clipbrd.h"
+	"wx/osx/clipbrd.h"
+	"wx/qt/clipbrd.h"
+
+1544370008 f:\projects\wxwidgets-3.1.2\include\wx\msw\clipbrd.h
+
+1544370008 f:\projects\wxwidgets-3.1.2\include\wx\motif\clipbrd.h
+	"wx/list.h"
+
+1544370008 f:\projects\wxwidgets-3.1.2\include\wx\gtk\clipbrd.h
+	"wx/weakref.h"
+
+1544370008 f:\projects\wxwidgets-3.1.2\include\wx\gtk1\clipbrd.h
+	"wx/object.h"
+	"wx/list.h"
+	"wx/dataobj.h"
+	"wx/control.h"
+	"wx/module.h"
+
+1544370008 f:\projects\wxwidgets-3.1.2\include\wx\x11\clipbrd.h
+	"wx/object.h"
+	"wx/list.h"
+	"wx/dataobj.h"
+	"wx/control.h"
+	"wx/module.h"
+
+1544370008 f:\projects\wxwidgets-3.1.2\include\wx\osx\clipbrd.h
+	"wx/osx/core/cfref.h"
+
+1544370008 f:\projects\wxwidgets-3.1.2\include\wx\qt\clipbrd.h
+	"wx/weakref.h"
+
+1544370008 f:\projects\wxwidgets-3.1.2\include\wx\msw\dib.h
+	"wx/msw/private.h"
+	"wx/bitmap.h"
+
+1544370008 f:\projects\wxwidgets-3.1.2\include\wx\webview.h
+	"wx/defs.h"
+	"wx/control.h"
+	"wx/event.h"
+	"wx/sstream.h"
+	"wx/sharedptr.h"
+	"wx/vector.h"
+	"wx/osx/webviewhistoryitem_webkit.h"
+	"wx/gtk/webviewhistoryitem_webkit.h"
+	"wx/msw/webviewhistoryitem_ie.h"
+
+1544370008 f:\projects\wxwidgets-3.1.2\include\wx\osx\webviewhistoryitem_webkit.h
+	"wx/defs.h"
+	"wx/osx/core/objcid.h"
+
+1544370008 f:\projects\wxwidgets-3.1.2\include\wx\osx\core\objcid.h
+
+1544370008 f:\projects\wxwidgets-3.1.2\include\wx\gtk\webviewhistoryitem_webkit.h
+	"wx/setup.h"
+
+1544370008 f:\projects\wxwidgets-3.1.2\include\wx\msw\webviewhistoryitem_ie.h
+	"wx/setup.h"
+
+1544370008 f:\projects\wxwidgets-3.1.2\include\wx\msw\dc.h
+	"wx/defs.h"
+	"wx/dc.h"
 

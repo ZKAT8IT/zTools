@@ -24,6 +24,9 @@ TPConnection::TPConnection(wxString id)
     //Send the request to Touch Portal
     this->wxSocketClient::Write(request.mb_str(), request.Length());
     cout << "Request sent" << endl;
+
+    //memOutputStream = new wxMemoryOutputStream();
+    //memBuffer = new wxMemoryBuffer();
 }
 
 bool TPConnection::IsData()
@@ -165,7 +168,8 @@ void TPConnection::UpdateList(wxString id, wxString instanceId, wxArrayString va
 
 void TPConnection::UpdateConnector(wxString id, wxString value)
 {
-    wxString request = wxT("{\"type\":\"connectorUpdate\",\"connectorId\":\"") + id + wxT("\",\"value\":\"") + value + wxT("\"}\n");
+    wxString request = wxT("{\"type\":\"connectorUpdate\",\"connectorId\":\"") + id + wxT("\",\"value\":") + value + wxT("}\n");
+    cout << "Update Request " << request.mb_str() << endl;
     if(this->wxSocketClient::IsConnected())
         this->wxSocketClient::Write(request.mb_str(), request.Length());
 }
