@@ -39,7 +39,7 @@
         - Added If And/Or Then Operator
         - Added If Ando/or Then Else Operator
     - Changes
-        - Created Seperate Loop For Processing Events, Should be approx 25x Faster
+        - Created Separate Loop For Processing Events, Should be approx 25x Faster
 0.9 - Update
     - Actions
         - Combined Screen Capture and Window Capture Into 1 Action now.
