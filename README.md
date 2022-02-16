@@ -34,6 +34,11 @@
 
 ## Changelog
 ```
+1.1 - Update
+    - Changes
+        - Screen/Window Capture now looks for selected window title, then same exe name if window title isn't found.
+        - Fixed Importing into Touch Portal freezing mid import.
+        - Fixed Else returning wrong data on the If/Else Operator Action.
 1.0 - Update
     - Actions
         - Added If And/Or Then Operator
