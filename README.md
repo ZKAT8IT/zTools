@@ -34,6 +34,15 @@
 
 ## Changelog
 ```
+1.2- Update
+    - Added
+        - Run On Start Action
+        - Get Window Title Action
+        - Added Unicode Support
+    - Changes
+        - Timer completely reworked, runs at 100ms at all times.
+        - Fixed several conversion errors with string relation actions.
+        - Scrolling Marquee now auto updates. Use with Dynamic Text Updater Action.
 1.1 - Update
     - Changes
         - Screen/Window Capture now looks for selected window title, then same exe name if window title isn't found.
