@@ -187,7 +187,7 @@ Returns a portion of the string provided with length set. Execute once, auto upd
 
 Example usage.
 
-(resources/TouchPortalScrollingMarqueeExample.png)
+![Scrolling Marquee Example](resources/TouchPortalScrollingMarqueeExample.png)
 
 ### Screen-Window Capture
 
@@ -206,7 +206,13 @@ Repeat Actions at 100ms intervals.
 
 Increase length of timer example ( runs every 5 seconds ).
 
-(resources/TouchPortalNewTimerExtendExample.png)
+![Timer Example](resources/TouchPortalNewTimerExtendExample.png)
+
+### Run On Start
+
+Execute Actions Upon Plugin/Touch Portal Starting
+
+![RunOnStart](resources/TouchPortalRunOnStart.png)
 
 ## Connectors
 
