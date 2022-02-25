@@ -17,10 +17,12 @@
     - [Starts With](#starts-with)
     - [Ends With](#ends-with)
     - [Length](#length)
+    - [Get Window Title](#get-window-title)
     - [Scrolling Marquee](#scrolling-marquee)
     - [Screen Window Capture](#screen-capture)
   - [Events](#events)
     - [Timer](#timer)
+    - [Run On Start](#run-on-start)
   - [Connectors](#connectors)
     - [Get Slider Value](#get-slider-value)
   - [States](#states)
@@ -179,9 +181,13 @@ Returns the length of the value.
 
 ### Scrolling Marquee
 
-Returns a portion of the string provided with length set.
+Returns a portion of the string provided with length set. Execute once, auto updates to sMarquee values. Use with Dynamic Text Updater Event.
 
 ![Scrolling Marquee](resources/ScrollingMarquee.png)
+
+Example usage.
+
+(resources/TouchPortalScrollingMarqueeExample.png)
 
 ### Screen-Window Capture
 
@@ -194,9 +200,13 @@ Will return a 128x128 Image capture of the screen at designated coordinates.
 
 ### Timer
 
-Repeat Actions at set intervals.
+Repeat Actions at 100ms intervals.
 
-![Timer](resources/Timer.png)
+![Timer](resources/TouchPortalNewTimer.png)
+
+Increase length of timer example ( runs every 5 seconds ).
+
+(resources/TouchPortalNewTimerExtendExample.png)
 
 ## Connectors
 
